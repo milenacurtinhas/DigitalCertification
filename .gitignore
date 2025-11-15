@@ -1,16 +1,19 @@
 # Arquivos sensíveis
 **/private/*.key
 *.key
+*.p12
+*.pfx
+*.der
 
-# Arquivos temporários
-*.csr
-*.srl
-*.old
-index.txt.attr*
-
-# Docker
+# Docker e configs de ambiente
 .env
 
-# OS
+# Arquivos do sistema operacional
 .DS_Store
 Thumbs.db
+
+# Pastas e arquivos de build
+__pycache__/
+*.pyc
+build/
+dist/
