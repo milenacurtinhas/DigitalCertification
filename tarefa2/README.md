@@ -68,11 +68,20 @@ docker-compose up -d
 3. Aba "Autoridades" → Importar
 4. Selecione `ca-root/certs/ca-root.pem`
 
-### 6. Acessar o Site
+### 6. Acessar o Site:
 
 Abra o navegador e acesse: `https://localhost`
 
 Você deverá ver o cadeado indicando conexão segura!
+
+### 7. Validar a cadeia de certificação no terminal:
+
+```
+openssl verify -CAfile ca-root/certs/ca-root.pem \
+    -untrusted ca-intermediate/certs/ca-intermediate.pem \
+    ca-intermediate/certs/server.crt
+
+```
 
 ## Estrutura de Arquivos
 
