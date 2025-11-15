@@ -1,0 +1,10 @@
+services:
+  nginx:
+    image: nginx:latest
+    ports:
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./ca-intermediate/certs/server-fullchain.pem:/etc/nginx/ssl/server.crt
+      - ./ca-intermediate/private/server.key:/etc/nginx/ssl/server.key
+      - ./html:/usr/share/nginx/html

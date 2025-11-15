@@ -1,0 +1,16 @@
+# Arquivos sensíveis
+**/private/*.key
+*.key
+
+# Arquivos temporários
+*.csr
+*.srl
+*.old
+index.txt.attr*
+
+# Docker
+.env
+
+# OS
+.DS_Store
+Thumbs.db
