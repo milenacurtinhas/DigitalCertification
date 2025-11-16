@@ -30,7 +30,7 @@ def create_root_ca():
     ).not_valid_before(
         datetime.datetime.now(datetime.timezone.utc)
     ).not_valid_after(
-        #note: validade de 10 anos/padrão
+        # Validade de 10 anos
         datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=365*10)
     ).add_extension(
         x509.KeyUsage(
@@ -85,7 +85,7 @@ def create_intermediate_ca(root_cert, root_key):
     ).not_valid_before(
         datetime.datetime.now(datetime.timezone.utc)
     ).not_valid_after(
-        #note: validade de 3 anos/padrão
+        # Validade de 3 anos
         datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=365*3)
     ).add_extension(
         x509.KeyUsage(
@@ -122,6 +122,7 @@ def create_intermediate_ca(root_cert, root_key):
 def issue_certificate(ca, ca_key):
     key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
 
+    # Certificate Signing Request
     csr = x509.CertificateSigningRequestBuilder().subject_name(x509.Name([
         x509.NameAttribute(NameOID.COUNTRY_NAME, 'BR'),
         x509.NameAttribute(NameOID.STATE_OR_PROVINCE_NAME, 'Espirito Santo'),
@@ -136,10 +137,55 @@ def issue_certificate(ca, ca_key):
         critical=False,
     ).sign(key, hashes.SHA256())
 
+    # Sign Certificate 
+    server_cert = x509.CertificateBuilder().subject_name(
+        csr.subject
+    ).issuer_name(
+        ca.subject
+    ).public_key(
+        csr.public_key()
+    ).serial_number(
+        x509.random_serial_number()
+    ).not_valid_before(
+        datetime.datetime.now(datetime.timezone.utc)
+    ).not_valid_after(
+        # Validade de 100 dias
+        datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=100)
+    ).add_extension(
+        csr.extensions.get_extension_for_class(x509.SubjectAlternativeName).value,
+        critical=False,
+    ).add_extension(
+        x509.BasicConstraints(ca=False, path_length=None),
+        critical=True,
+    ).add_extension(
+        x509.KeyUsage(
+            digital_signature=True,
+            content_commitment=False,
+            key_encipherment=True,
+            data_encipherment=False,
+            key_agreement=False,
+            key_cert_sign=False,
+            crl_sign=False,
+            encipher_only=False,
+            decipher_only=False,
+        ),
+        critical=True,
+    ).add_extension(
+        x509.ExtendedKeyUsage([x509.ExtendedKeyUsageOID.SERVER_AUTH]),
+        critical=False,
+    ).add_extension(
+        x509.SubjectKeyIdentifier.from_public_key(csr.public_key()),
+        critical=False,
+    ).add_extension(
+        x509.AuthorityKeyIdentifier.from_issuer_subject_key_identifier(
+            ca.extensions.get_extension_for_class(x509.SubjectKeyIdentifier).value
+        ),
+        critical=False,
+    ).sign(ca_key, hashes.SHA256())
+
     folder_path = files_manager.create_folder('server')
     files_manager.save_key(key, folder_path, 'server_key')
-    files_manager.save_pem(csr, folder_path, extension='csr')
+    files_manager.save_pem(csr, folder_path, 'csr', extension='csr')
+    files_manager.save_pem(server_cert, folder_path, 'server_cert', extension='crt')
 
-    #Completar a emissão e assinatura do certificado
-
-
+    return server_cert
