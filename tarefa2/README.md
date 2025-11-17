@@ -40,27 +40,13 @@ Este script irá:
 - Criar Certificate Signing Request (CSR)
 - Assinar certificado com a CA Intermediária (válido por 1 ano)
 
-### 3. Verificar Cadeia de Certificação
-
-```
-./generate-server-cert.sh
-```
-
-Saída esperada: `ca-intermediate/certs/server.crt: OK`
-
-### 4. Iniciar Servidor Nginx
+### 3. Iniciar Servidor Nginx
 
 ```
 docker-compose up -d
 ```
 
-### 5. Importar CA Raiz no Navegador
-
-#### Chrome/Edge:
-1. Acesse `chrome://settings/certificates`
-2. Aba "Autoridades" → Importar
-3. Selecione `ca-root/certs/ca-root.pem`
-4. Marque "Confiar neste certificado para identificar sites"
+### 4. Importar CA Raiz no Navegador
 
 #### Firefox:
 1. Acesse `about:preferences#privacy`
@@ -68,13 +54,21 @@ docker-compose up -d
 3. Aba "Autoridades" → Importar
 4. Selecione `ca-root/certs/ca-root.pem`
 
-### 6. Acessar o Site:
+### 5. Acessar o Site:
 
 Abra o navegador e acesse: `https://localhost`
 
 Você deverá ver o cadeado indicando conexão segura!
 
-### 7. Validar a cadeia de certificação no terminal:
+### 6. Verificar Cadeia de Certificação
+
+```
+./verify-certificates.sh > resultado_validacao.txt 2>&1
+```
+
+Saída esperada: `ca-intermediate/certs/server.crt: OK`
+
+#### Validar a cadeia de certificação no terminal:
 
 ```
 openssl verify -CAfile ca-root/certs/ca-root.pem \
@@ -82,6 +76,16 @@ openssl verify -CAfile ca-root/certs/ca-root.pem \
     ca-intermediate/certs/server.crt
 
 ```
+
+## Verificação dos certificados
+
+### Saída do terminal
+
+Ver aquivo `resultado_validacao.txt` para evidências da implementação funcionando.
+
+### Screenshots
+
+Ver pasta `screenshots/` para evidências visuais da implementação funcionando.
 
 ## Estrutura de Arquivos
 
@@ -128,11 +132,18 @@ tarefa2/
 ├── openssl-ca-intermediate.cnf
 ├── openssl-ca-root.cnf
 ├── README.md
+├── resultado_validacao.txt
 ├── screenshots
+│   ├── img10.png
+│   ├── img1.png
+│   ├── img2.png
+│   ├── img3.png
+│   ├── img4.png
+│   ├── img5.png
+│   ├── img6.png
+│   ├── img7.png
+│   ├── img8.png
+│   └── img9.png
 ├── setup-ca.sh
 └── verify-certificates.sh
 ```
-
-## Screenshots
-
-Ver pasta `screenshots/` para evidências visuais da implementação funcionando.

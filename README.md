@@ -7,9 +7,8 @@
 ### Informações do Grupo
 - **Disciplina:** Segurança em Computação 2025/2
 - **Integrantes:**  
-  - Nome: _____________  
-  - Nome: _____________  
-  - Nome: _____________  
+  - Nome: Marcela Carpenter da Paixao   
+  - Nome: Milena Curtinhas Santos
 
 ---
 
@@ -26,8 +25,9 @@ Descreva e desenhe (use figuras) a arquitetura geral dos dois cenários implemen
 ### 2.1. Preparação do Ambiente
 - Sistema operacional: ____________________  
 - Ferramentas utilizadas: ____________________  
-- Versão do Docker / Nginx: ____________________  
+- Versão do Docker / Nginx: Docker version 28.4.0, nginx version: nginx/1.29.3  
 - Descreva e disponibilize a configuração do servidor web e a página de exemplo criada:
+A configuração do servidor web está no arquivo tarefa1/nginx.conf, que define um servidor HTTPS escutando na porta 443 para o domínio localhost, usando o certificado TLS localizado em /etc/nginx/ssl/server.crt e a chave privada em /etc/nginx/ssl/server_key.key. O servidor Nginx serve arquivos estáticos do diretório /usr/share/nginx/html, cujo conteúdo corresponde à pasta html/ do seu projeto, incluindo a página inicial index.html. Essa página de exemplo é um arquivo HTML básico que demonstra a página que os usuários verão ao acessar o servidor via HTTPS, garantindo que a conexão está protegida e autenticada pelo certificado emitido pela sua infraestrutura PKI.
 
 ### 2.2. Exposição com ngrok
 - Domínio público gerado: ______________________________  
@@ -39,12 +39,19 @@ Descreva e desenhe (use figuras) a arquitetura geral dos dois cenários implemen
 
 ### 2.4. Configuração HTTPS no Nginx
 - Descreva como foi feita a configuração do servidor para uso do certificado emitido.
+A configuração do servidor foi realizada configurando o Nginx em um container Docker para servir HTTPS utilizando os certificados gerados pela infraestrutura PKI criada em Python, onde o arquivo `server-fullchain.pem` contém a cadeia completa de certificados (servidor, intermediária, raiz) e a chave privada do servidor está no arquivo `server_key.key`; estes arquivos foram montados como volumes no container Nginx e referenciados na configuração do Nginx para ativar a camada de segurança SSL, enquanto a porta 8443 foi exposta para acesso externo, e para que os navegadores confiem na conexão segura, é necessário importar o certificado da CA raiz manualmente no navegador, garantindo assim uma comunicação segura e validada pela cadeia de certificação criada.
 
 ### 2.5. Resultados e Validação
-- URL de acesso: ______________________________  
-- Screenshot da página HTTPS: *(inserir imagem)*  
-- Resultado do comando de verificação: ______________________________  
-- Screenshot do certificado no navegador (cadeado): *(inserir imagem)*  
+- URL de acesso: https://localhost:8443/  
+- Screenshot da página HTTPS: ![pag https](tarefa1/screenshots/img1.png)
+- Resultado do comando de verificação: Certificado 0 verificado com sucesso pelo emissor 1
+
+    Certificado 1 verificado com sucesso pelo emissor 2
+
+    Certificado raiz é autoassinado e válido.
+
+    Validação da cadeia de certificação foi bem-sucedida! 
+- Screenshot do certificado no navegador (cadeado): ![cert1](tarefa1/screenshots/img2.png)
 
 ---
 

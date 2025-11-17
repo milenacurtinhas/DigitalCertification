@@ -13,6 +13,7 @@
 Thumbs.db
 
 # Pastas e arquivos de build
+venv/
 __pycache__/
 *.pyc
 build/

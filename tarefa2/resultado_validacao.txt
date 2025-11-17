@@ -1,0 +1,26 @@
+========================================
+Verificando Cadeia de Certificação
+========================================
+
+Verificando certificado da CA Raiz...
+        Subject: C = BR, ST = ES, L = Vitoria, O = UFES, OU = DI, CN = UFES Root CA, emailAddress = admin@ufes.br
+        Subject Public Key Info:
+            Public Key Algorithm: rsaEncryption
+
+Verificando certificado da CA Intermediária...
+        Subject: C = BR, ST = ES, O = UFES, OU = DI, CN = UFES Intermediate CA, emailAddress = admin@ufes.br
+        Subject Public Key Info:
+            Public Key Algorithm: rsaEncryption
+
+Verificando certificado do servidor...
+        Subject: C = BR, ST = ES, L = Vitoria, O = UFES, OU = DI, CN = localhost
+        Subject Public Key Info:
+            Public Key Algorithm: rsaEncryption
+
+Validando cadeia de certificação completa...
+ca-intermediate/certs/server.crt: OK
+Cadeia de certificação válida!
+
+========================================
+Verificação concluída com sucesso!
+========================================
