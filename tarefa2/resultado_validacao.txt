@@ -1,6 +1,3 @@
-========================================
-Verificando Cadeia de Certificação
-========================================
 
 Verificando certificado da CA Raiz...
         Subject: C = BR, ST = ES, L = Vitoria, O = UFES, OU = DI, CN = UFES Root CA, emailAddress = admin@ufes.br
@@ -20,7 +17,3 @@ Verificando certificado do servidor...
 Validando cadeia de certificação completa...
 ca-intermediate/certs/server.crt: OK
 Cadeia de certificação válida!
-
-========================================
-Verificação concluída com sucesso!
-========================================

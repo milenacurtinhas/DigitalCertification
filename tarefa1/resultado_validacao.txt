@@ -1,0 +1,5 @@
+Assinatura OK: <Name(C=BR,ST=Espirito Santo,L=Vitoria,O=Organização fictícia,CN=localhost)> assinado por <Name(C=BR,ST=Espirito Santo,L=Vitoria,O=Organização fictícia,CN=Intermediate CA)>
+Assinatura OK: <Name(C=BR,ST=Espirito Santo,L=Vitoria,O=Organização fictícia,CN=Intermediate CA)> assinado por <Name(C=BR,ST=Espirito Santo,L=Vitoria,O=Organização fictícia,CN=Root CA)>
+Assinatura OK: <Name(C=BR,ST=Espirito Santo,L=Vitoria,O=Organização fictícia,CN=Root CA)> assinado por <Name(C=BR,ST=Espirito Santo,L=Vitoria,O=Organização fictícia,CN=Root CA)>
+
+Cadeia de certificação completa: OK

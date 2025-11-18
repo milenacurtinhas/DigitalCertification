@@ -1,9 +1,3 @@
-#!/bin/bash
-
-echo "========================================"
-echo "Verificando Cadeia de Certificação"
-echo "========================================"
-
 
 echo -e "\nVerificando certificado da CA Raiz..."
 openssl x509 -noout -text -in ca-root/certs/ca-root.pem | grep -A 2 "Subject:"
@@ -25,7 +19,3 @@ else
     echo -e " Erro na validação da cadeia"
     exit 1
 fi
-
-echo -e "\n========================================"
-echo "Verificação concluída com sucesso!"
-echo "========================================"

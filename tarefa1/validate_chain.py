@@ -33,8 +33,6 @@ def check_validity(cert):
     if now < cert.not_valid_before_utc or now > cert.not_valid_after_utc:
         raise Exception(f"Certificado expirado ou ainda não válido: {cert.subject}")
 
-# --- Fluxo Principal ---
-
 # Caminhos
 server_cert_path = "ca_storage/server/server_cert.crt"
 intermediate_cert_path = "ca_storage/intermediate/intermediate_cert.pem"

@@ -8,12 +8,6 @@ Implementação de uma Infraestrutura de Chaves Públicas (PKI) completa usando 
 - **CA Intermediária**: Assinada pela CA Raiz
 - **Certificado do Servidor**: Assinado pela CA Intermediária para `localhost`
 
-## Pré-requisitos
-
-- Docker e Docker Compose instalados
-- OpenSSL instalado
-- Navegador web
-
 ## Execução Passo a Passo
 
 ### 1. Criar a Infraestrutura de CA
@@ -22,12 +16,7 @@ Implementação de uma Infraestrutura de Chaves Públicas (PKI) completa usando 
 ./setup-ca.sh
 ```
 
-Este script irá:
-- Criar CA Raiz com chave RSA 4096 bits
-- Gerar certificado autoassinado da CA Raiz (válido por 10 anos)
-- Criar CA Intermediária com chave RSA 4096 bits
-- Assinar certificado da CA Intermediária com a CA Raiz (válido por 5 anos)
-- Criar bundle da cadeia de certificação
+Este script irá criar CA Raiz com chave RSA, gerar certificado autoassinado da CA Raiz, criar CA Intermediária com chave RSA, assinar certificado da CA Intermediária com a CA Raiz e Criar bundle da cadeia de certificação.
 
 ### 2. Gerar Certificado do Servidor
 
@@ -35,10 +24,7 @@ Este script irá:
 ./generate-server-cert.sh
 ```
 
-Este script irá:
-- Gerar chave privada do servidor (RSA 2048 bits)
-- Criar Certificate Signing Request (CSR)
-- Assinar certificado com a CA Intermediária (válido por 1 ano)
+Este script irá gerar a chave privada do servidor, criar Certificate Signing Request (CSR) e assinar certificado com a CA Intermediária.
 
 ### 3. Iniciar Servidor Nginx
 
@@ -68,7 +54,7 @@ Você deverá ver o cadeado indicando conexão segura!
 
 Saída esperada: `ca-intermediate/certs/server.crt: OK`
 
-#### Validar a cadeia de certificação no terminal:
+#### Validar a cadeia de certificação direto no terminal:
 
 ```
 openssl verify -CAfile ca-root/certs/ca-root.pem \
