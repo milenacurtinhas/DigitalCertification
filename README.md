@@ -15,17 +15,17 @@
 ## 1. Arquitetura do Ambiente
 Descreva e desenhe (use figuras) a arquitetura geral dos dois cenários implementados, destacando suas diferenças principais:
 
-- **Cenário 1:** Let's Encrypt + ngrok — uso de uma autoridade certificadora pública para emissão automática de certificados válidos por meio do protocolo ACME.  
+- **Cenário 1:** HTTPS com Certificado Válido via CA Privada (Root + Intermediária) usando Python.  
 
-    A arquitetura geral do cenário Let's Encrypt + ngrok se baseia no uso de uma autoridade certificadora pública (Let's Encrypt) que, por meio do protocolo ACME, automatiza a emissão e renovação de certificados TLS válidos; já o ngrok cria um túnel seguro e expõe um servidor local para a internet através de uma URL pública temporária, possibilitando que o cliente ACME prove o controle do domínio gerado pelo ngrok ao responder aos desafios da Let’s Encrypt, permitindo obter automaticamente certificados confiáveis para ambientes locais expostos publicamente, com renovação gerenciada pela própria ACME, facilitando o desenvolvimento, testes e demonstrações seguros via HTTPS mesmo em servidores sem IP fixo ou configuração complexa de DNS. Em contraste, uma PKI própria oferece controle total sobre a autoridade certificadora e as políticas de emissão, permitindo personalização para ambientes internos, mas exige manutenção de infraestrutura, não é automaticamente reconhecida por navegadores e sistemas externos, e precisa que os usuários importem manualmente a CA raiz para confiar nos certificados emitidos.
+    Nesse cenário, toda a cadeia PKI (CA Raiz, CA Intermediária e certificados de servidor) é gerada e gerenciada programaticamente usando scripts em Python, utilizando principalmente a bibliotecas cryptography. A arquitetura consiste em módulos Python que criam as chaves privadas, geram as requisições de assinatura (CSR), assinam certificados e armazenam os arquivos em diretórios organizados. A configuração do servidor web HTTPS (exemplo Nginx) usa esses certificados gerados dinamicamente. Esse método enfatiza automação, flexibilidade e integração programática, permitindo personalização e extensão no processo de criação e renovação dos certificados conforme necessário, além de favorecer o aprendizado detalhado da estrutura e operações internas da PKI.
 
-- **Cenário 2:** PKI própria (Root + Intermediária) — criação e operação de uma infraestrutura de chaves públicas local, com emissão de certificados assinados por uma CA interna.
+- **Cenário 2:** HTTPS com Certificado Válido via CA Privada (Root + Intermediária) usando OpenSSL.
 
-    O cenário 2 apresenta uma infraestrutura de chaves públicas (PKI) própria, composta por uma CA raiz e uma CA intermediária. A CA raiz é a autoridade máxima, autoassinada e isolada para proteção máxima, responsável por emitir e assinar o certificado da CA intermediária, que funciona como um intermediário para emitir certificados aos servidores ou usuários finais. Essa arquitetura em camadas permite que a CA raiz permaneça offline ou com acesso restrito, aumentando a segurança, enquanto a CA intermediária realiza as operações diárias de emissão e revogação de certificados, delegando autoridade da raiz. A PKI própria assim permite maior controle e personalização da cadeia de confiança, mas requer que o certificado da CA raiz seja manualmente importado e confiado nos dispositivos finais para validar os certificados emitidos pela CA intermediária, garantindo uma cadeia confiável e segura dentro do ambiente mas tornando sua aceitação limitada a ambientes privados ou controlados. Já no cenário ACME com uma CA pública reconhecida, como o Let's Encrypt, os certificados emitidos são automaticamente confiáveis por navegadores e sistemas operacionais globalmente, sem necessidade de importação manual, facilitando a automação e escalabilidade da emissão e renovação, sendo ideal para ambientes públicos e aplicações na internet, mas com menos controle direto sobre a autoridade certificadora.
+    Neste cenário, a arquitetura baseia-se em comandos OpenSSL no terminal para gerar manualmente cada componente da PKI: a CA Raiz, a CA Intermediária, os certificados do servidor, gerando arquivos PEM e CRT que são utilizados na configuração do servidor HTTPS. A organização dos certificados e chaves é feita em diretórios fixos e o processo é menos automatizado, demandando a execução sequencial de comandos e scripts shell, ou manuais. Essa abordagem é altamente transparente, com controle direto sobre cada comando e parâmetro de certificação, sendo ideal para entender o funcionamento das ferramentas padrão de criptografia de certificados, mas com menos flexibilidade programática direta.
 
 ---
 
-## 2. Tarefa 1 – HTTPS com Certificado Público (Let's Encrypt + ngrok)
+## 2. Tarefa 1 – HTTPS com Certificado Válido via CA Privada (Root + Intermediária) usando Python
 
 ### 2.1. Preparação do Ambiente
 - Sistema operacional: Linux - Ubuntu  
@@ -38,20 +38,18 @@ Descreva e desenhe (use figuras) a arquitetura geral dos dois cenários implemen
 
     A configuração do servidor web está no arquivo `tarefa1/nginx.conf`, que define um servidor HTTPS escutando na porta 443 para o domínio localhost, usando o certificado TLS localizado em `/etc/nginx/ssl/server_fullchain.crt` e a chave privada em `/etc/nginx/ssl/server_key.key`. O servidor Nginx serve arquivos estáticos do diretório `/usr/share/nginx/html`, cujo conteúdo corresponde à pasta html/ do projeto, incluindo a página inicial `index.html`. Essa página de exemplo é um arquivo HTML básico que demonstra a página que os usuários verão ao acessar o servidor via HTTPS, garantindo que a conexão está protegida e autenticada pelo certificado emitido pela sua infraestrutura PKI.
 
-### 2.2. Exposição com ngrok
-- Domínio público gerado: ______________________________  
-- Explique como o túnel foi utilizado para permitir a validação do domínio pelo Let's Encrypt.
-
-### 2.3. Emissão do Certificado
-- Caminho do certificado gerado: _________________________  
+### 2.2. Emissão do Certificado
+- Caminho do certificado gerado: tarefa1/ca_storage/server/server_cert.crt  
 - Explique o processo de validação e emissão e quais arquivos foram gerados.
 
-### 2.4. Configuração HTTPS no Nginx
+    Primeiramente, a CA Raiz autoassinada gera a chave privada e o certificado raiz (arquivo `ca_storage/root/root_cert.pem e chave root_key.key`), que serve como a autoridade confiável máxima; em seguida, a CA Intermediária tem sua própria chave e certificado (`ca_storage/intermediate/intermediate_cert.pem` e `intermediate_key.key`), que é assinado pela CA Raiz, formando uma cadeia de confiança; com essa cadeia, é gerada uma requisição de assinatura de certificado (CSR) para o servidor (`ca_storage/server/csr.csr`), que é então assinada pela CA Intermediária para criar o certificado do servidor (`ca_storage/server/server_cert.crt`), que junto à chave privada do servidor (`server_key.key`) será usado para o HTTPS; além disso, o arquivo `server_fullchain.crt` é gerado concatenando o certificado do servidor e o certificado da CA Intermediária, permitindo que servidores como o Nginx apresentem a cadeia completa para validadores externos. Para validar essa cadeia, é possível usar o script Python `validate_chain.py` que carrega esses certificados e verifica a validade e integridade da cadeia, garantindo que o certificado do servidor é confiável a partir da CA Raiz.
+
+### 2.3. Configuração HTTPS no Nginx
 - Descreva como foi feita a configuração do servidor para uso do certificado emitido.
 
     A configuração do servidor foi realizada configurando o Nginx em um container Docker para servir HTTPS utilizando os certificados gerados pela infraestrutura PKI criada em Python, onde o arquivo `server-fullchain.pem` contém a cadeia completa de certificados (servidor, intermediária, raiz) e a chave privada do servidor está no arquivo `server_key.key`; estes arquivos foram montados como volumes no container Nginx e referenciados na configuração do Nginx para ativar a camada de segurança SSL, enquanto a porta 8443 foi exposta para acesso externo, e para que os navegadores confiem na conexão segura, é necessário importar o certificado da CA raiz manualmente no navegador, garantindo assim uma comunicação segura e validada pela cadeia de certificação criada.
 
-### 2.5. Resultados e Validação
+### 2.4. Resultados e Validação
 - URL de acesso: https://localhost:8443/  
 - Screenshot da página HTTPS: 
 
@@ -73,7 +71,7 @@ Descreva e desenhe (use figuras) a arquitetura geral dos dois cenários implemen
 
 ---
 
-## 3. Tarefa 2 – HTTPS com PKI Própria (Root + Intermediária)
+## 3. Tarefa 2 – HTTPS com Certificado Válido via CA Privada (Root + Intermediária) usando OpenSSL
 
 ### 3.1. Criação da CA Raiz
 - Explique o papel da CA raiz, descreva o processo de criação e a importância na cadeia de confiança.
@@ -149,13 +147,13 @@ Descreva o procedimento adotado para importar o certificado raiz no navegador:
 ## 4. Comparação entre os Dois Cenários
 Responda às questões abaixo com base na experiência prática:
 
-- Quais as principais diferenças entre o uso de certificados públicos e privados?
+- Quais as principais diferenças entre o uso de Python e OpenSSL?
 
-    Certificados públicos são emitidos por autoridades certificadoras reconhecidas globalmente e confiáveis por navegadores e sistemas operacionais, o que garante automaticamente a confiança e validade dos certificados para conexões seguras na internet. Já os certificados privados são emitidos por uma autoridade certificadora própria, que proporciona controle total sobre políticas de emissão, uso e segurança, sendo ideais para ambientes internos ou corporativos, mas exigem que o certificado da CA raiz seja instalado manualmente em cada sistema cliente para que seja confiável, o que limita seu uso fora desse ambiente controlado. Além disso, certificados públicos normalmente possuem processos automáticos de emissão e renovação (por exemplo, via Let's Encrypt e ACME), enquanto certificados privados demandam infraestrutura própria para a gestão da PKI e dos certificados emitidos.
+    O uso de Python para criação e gerenciamento de uma PKI privada é ideal pra maior automação, flexibilidade e integração programática, permitindo que todo o ciclo de vida dos certificados seja controlado por scripts de forma eficiente e escalável, enquanto o OpenSSL, sendo uma ferramenta de linha de comando, oferece controle direto e detalhado sobre cada aspecto da geração e assinatura dos certificados, sendo um processos manual que requer conhecimento técnico dos comandos, sendo ideal para operações pontuais e aprendizado dos fundamentos criptográficos.
 
 - Em quais cenários cada abordagem é mais adequada?
 
-    Certificados públicos são mais adequados para aplicações expostas na internet que exigem confiança imediata e maior compatibilidade com navegadores e dispositivos, como sites de ecommerce, serviços públicos, sites e qualquer serviço onde usuários externos acessam, pois facilitam a validação automática e garantem a segurança do tráfego. Já certificados privados são ideais para ambientes internos corporativos, redes fechadas, sistemas de comunicação internos, IoT e testes, onde o controle sobre políticas de emissão, custos baixos e flexibilidade são importantes, e a confiança é gerenciada internamente mediante a importação da CA raiz pelos dispositivos e usuários envolvidos.
+    A abordagem com Python é mais adequada para cenários que demandam automação e reutilização, onde é necessário gerenciar dinamicamente a emissão, renovação e armazenamento de certificados em larga escala ou em ambientes que evoluem rapidamente. Já o uso do OpenSSL foca em transparência e controle das operações criptográficas sendo ideal para ambientes estáticos ou de configuração manual, onde o controle detalhado sobre cada comando e parâmetro é importante, casos em que a automação não é prioridade e o processo manual é suficiente.
 
 - Por que a importação da CA raiz é necessária no segundo cenário?  
 
@@ -166,7 +164,7 @@ Responda às questões abaixo com base na experiência prática:
 ## 5. Conclusões
 - Apresente as principais lições aprendidas durante o projeto.  
 
-    Foi possível aprender profundamente os conceitos fundamentais de criptografia assimétrica, estrutura e funcionamento de certificados digitais, controle e geração manual das CAs e certificados, além de entender a cadeia de confiança e como validar certificados em ambientes controlados. O uso de linguagens como Python permite automatizar processos complexos de criação, assinatura e gerenciamento dos certificados, desenvolvendo habilidades práticas em scripting e segurança de sistemas
+    Foi possível aprender profundamente os conceitos fundamentais de criptografia assimétrica, estrutura e funcionamento de certificados digitais, controle e geração manual das CAs e certificados, além de entender a cadeia de confiança e como validar certificados em ambientes controlados. O uso das linguagens como Python ou o uso do OpenSSL permite automatizar processos complexos de criação, assinatura e gerenciamento dos certificados, desenvolvendo habilidades práticas em scripting e segurança de sistemas
 
 - Explique a importância prática da certificação digital e da confiança em ambientes seguros.
 
