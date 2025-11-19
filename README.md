@@ -180,7 +180,7 @@ Responda às questões abaixo com base na experiência prática:
 | PKI própria criada (Root + Intermediária) | ✅ |
 | Importação da CA raiz no navegador | ✅ |
 | Cadeia de certificação validada com sucesso | ✅ |
-| Relatório completo e entregue | ✅ / ❌ |
+| Relatório completo e entregue | ✅ |
 | Apresentação prática (vídeo) | ✅ / ❌ |
 
 ---
