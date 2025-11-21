@@ -4,11 +4,11 @@ from cryptography.hazmat.primitives import serialization
 
 def create_folder(folder_name):
     """
-    Função que cria uma subpasta dentro de um diretório pré-definido ('tarefa1/ca_storage').
+    Função que cria uma nova pasta para armezar os arquivos.
     :param folder_name: nome da pasta a ser criada
     :return: retorna o caminho da nova pasta
     """
-    folder_path = Path(f'tarefa1/ca_storage/{folder_name}')
+    folder_path = Path(f'ca_storage/{folder_name}')
 
     try:
         folder_path.mkdir(parents=True, exist_ok=True)
