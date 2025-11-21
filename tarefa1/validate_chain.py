@@ -57,7 +57,6 @@ try:
     verify_signature(intermediate_cert, root_cert)
     
     # Passo C (Opcional): Verificar se o Root é auto-assinado (confiável por si só)
-    # Em sistemas reais, você confia no Root porque você o possui, não apenas pela assinatura.
     verify_signature(root_cert, root_cert)
 
     print("\nCadeia de certificação completa: OK")
