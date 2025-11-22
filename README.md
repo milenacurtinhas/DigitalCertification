@@ -182,6 +182,7 @@ Responda às questões abaixo com base na experiência prática:
 | Relatório completo e entregue | ✅ |
 | Apresentação prática (vídeo) | ✅ |
 
+Link do vídeo: https://drive.google.com/file/d/1O9xPBb1AQ1rg4vUzdb8SWMutRxEgeIcd/view?usp=sharing
 ---
 
 
