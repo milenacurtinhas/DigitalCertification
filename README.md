@@ -176,12 +176,11 @@ Responda às questões abaixo com base na experiência prática:
 | Item | Status |
 |------|--------|
 | Servidor Nginx funcional (Docker) | ✅ |
-| Certificado Let's Encrypt emitido e válido | ✅ / ❌ |
 | PKI própria criada (Root + Intermediária) | ✅ |
 | Importação da CA raiz no navegador | ✅ |
 | Cadeia de certificação validada com sucesso | ✅ |
 | Relatório completo e entregue | ✅ |
-| Apresentação prática (vídeo) | ✅ / ❌ |
+| Apresentação prática (vídeo) | ✅ |
 
 ---
 
